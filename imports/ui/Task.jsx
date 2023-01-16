@@ -1,5 +1,15 @@
 import React from "react";
+import { TasksCollection } from '../api/TasksCollection';
 
+const updateTask = ({_id}) => {
+    let updateTask = document.getElementById("updateTask");
+    TasksCollection.update(_id, {
+        $set: {
+            text:updateTask.value
+        }
+    });
+
+}
 export const Task = ({task, onCheckboxClick, onDeleteClick}) => {
     return (
         <li>
@@ -9,7 +19,14 @@ export const Task = ({task, onCheckboxClick, onDeleteClick}) => {
             onClick={() => onCheckboxClick(task)}
             readOnly
             />
-            <span>{task.text}</span>
+            {task.isChecked ?
+                <input type="text" id="updateTask" defaultValue={task.text}/> :
+                <span>{task.text}</span>
+            }
+            {task.isChecked ?
+                <button onClick={ () => updateTask(task)}>수정</button>:
+                ''
+            }
             <button onClick={ () => onDeleteClick(task)}>&times;</button>
         </li>
     )

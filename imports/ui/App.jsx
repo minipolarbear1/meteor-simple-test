@@ -17,12 +17,9 @@ export const App = () => {
     const user = useTracker(() => Meteor.user());
 
     const [hideCompleted, setHideCompleted] = useState(false);
-    const [taskUpdate, setTaskUpdate] = useState(false);
 
     const hideCompletedFilter = { isChecked: {$ne: true}}
-
     const userFilter = user ? { userId: user._id } : {};
-
     /*
     ...(Three dots) es6에서 새로 추가된 문법
     1. Three dots 함수가 매개변수의 끝에 있으면 "나머지 매개 변수" 이고 나머지 인수 목록을 배열로 수집
@@ -38,7 +35,6 @@ export const App = () => {
         if(!user){
             return [];
         }
-
         return TasksCollection.find(hideCompleted ? pendingOnlyFilter : userFilter, {
             sort: { createdAt: -1 },
         }).fetch();
