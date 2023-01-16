@@ -22,7 +22,6 @@ Meteor.startup(() => {
     }
 
     const user = Accounts.findUserByUsername(SEED_USERNAME);
-
     if(TasksCollection.find().count() === 0){
         [
             'First Task',
