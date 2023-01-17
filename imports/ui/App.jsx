@@ -1,11 +1,11 @@
 import React, {Fragment, useState} from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import { TasksCollection } from '../api/TasksCollection';
-import { Task } from './Task'
-import {TaskForm} from "./TaskForm";
-import {LoginForm} from "./LoginForm";
+import { Task } from './task/Task'
+import {TaskForm} from "./task/TaskForm";
+import {LoginForm} from "./login/LoginForm";
 
-
+// CheckBox 선택 여부 체크
 const toggleChecked = ({ _id, isChecked}) => {
     TasksCollection.update(_id, {
         $set: {
@@ -29,8 +29,8 @@ export const App = () => {
     https://dinn.github.io/javascript/js-dotdotdot/
     */
     const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
-    //최신순으로 정렬
-    //sort 1: ASC, -1: DESC
+
+    //최신순으로 정렬 sort 1: ASC, -1: DESC
     const tasks = useTracker(() =>{
         if(!user){
             return [];
@@ -70,7 +70,7 @@ export const App = () => {
                 {user ?(
                     <Fragment>
                         <div className="user" onClick={logout}>
-                            {user.username}
+                            {user.username || user.profile.name}
                         </div>
 
                         <TaskForm user={user} />

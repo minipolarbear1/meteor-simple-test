@@ -169,6 +169,22 @@ header {
     background-color: #62807e;
 }
 
+/*github login*/
+.github-btn{
+    border: 1px solid #e1e5f0;
+    background-color: #fff;
+    width: 245px;
+    margin: 0 auto 16px;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.github-btn > div {
+    margin-left: 4px;
+}
+
 /*로그아웃*/
 .user {
     display: flex;
