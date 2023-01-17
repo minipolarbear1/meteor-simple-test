@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import {TasksCollection} from "../api/TasksCollection";
+import {TasksCollection} from "../../api/TasksCollection";
 
 export const TaskForm = ({ user }) => {
+    //사용하고자 하는 저장된 값 text 해당값 업데이트 시 setText
     const [text, setText] = useState('');
 
     const handleSubmit = e => {
@@ -11,6 +12,7 @@ export const TaskForm = ({ user }) => {
             return;
         }
 
+        //task 저장
         TasksCollection.insert({
             text: text.trim(),
             createdAt: new Date(),
