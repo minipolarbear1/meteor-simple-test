@@ -1,5 +1,5 @@
 import React from "react";
-import { TasksCollection } from '../../api/TasksCollection';
+import { TasksCollection } from '../../../api/tasks/conllections/TasksCollection';
 
 const updateTask = ({_id}) => {
     let updateTask = document.getElementById("updateTask");

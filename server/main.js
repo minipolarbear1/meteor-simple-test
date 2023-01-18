@@ -1,7 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { TasksCollection } from "../imports/api/TasksCollection";
-
+import { TasksCollection } from "../imports/api/tasks/conllections/TasksCollection";
+import '/imports/startup/both/index'
+import '/imports/startup/server/index'
+// import '/imports/api/tasks/server/tasksMethods'
+// import '/imports/api/tasks/server/publications/tasksPublications'
 const insertTask = (taskText, user) =>
     TasksCollection.insert({
         text:taskText,
