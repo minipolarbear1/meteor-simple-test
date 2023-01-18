@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import {TasksCollection} from "../../api/TasksCollection";
+import { Meteor } from 'meteor/meteor';
+import {TasksCollection} from "../../../api/tasks/conllections/TasksCollection";
 
 export const TaskForm = ({ user }) => {
     //사용하고자 하는 저장된 값 text 해당값 업데이트 시 setText
@@ -12,12 +13,13 @@ export const TaskForm = ({ user }) => {
             return;
         }
 
-        //task 저장
-        TasksCollection.insert({
-            text: text.trim(),
-            createdAt: new Date(),
-            userId: user._id,
-        });
+        // //task 저장
+        // TasksCollection.insert({
+        //     text: text.trim(),
+        //     createdAt: new Date(),
+        //     userId: user._id,
+        // });
+        Meteor.call('tasks.insert', text);
 
         setText('');
     }

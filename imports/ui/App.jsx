@@ -1,17 +1,19 @@
 import React, {Fragment, useState} from 'react';
+import {Meteor} from "meteor/meteor";
 import { useTracker } from 'meteor/react-meteor-data';
-import { TasksCollection } from '../api/TasksCollection';
-import { Task } from './task/Task'
-import {TaskForm} from "./task/TaskForm";
-import {LoginForm} from "./login/LoginForm";
+import { TasksCollection } from '../api/tasks/conllections/TasksCollection';
+import { Task } from './components/task/Task'
+import {TaskForm} from "./components/task/TaskForm";
+import {LoginForm} from "./components/login/LoginForm";
 
 // CheckBox 선택 여부 체크
 const toggleChecked = ({ _id, isChecked}) => {
-    TasksCollection.update(_id, {
-        $set: {
-            isChecked: !isChecked
-        }
-    })
+    // TasksCollection.update(_id, {
+    //     $set: {
+    //         isChecked: !isChecked
+    //     }
+    // })
+    Meteor.call('tasks.setIsChecked', _id, !isChecked);
 };
 export const App = () => {
     const user = useTracker(() => Meteor.user());
@@ -30,25 +32,48 @@ export const App = () => {
     */
     const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
 
-    //최신순으로 정렬 sort 1: ASC, -1: DESC
-    const tasks = useTracker(() =>{
-        if(!user){
-            return [];
+    const { tasks, pendingTasksCount, isLoading } = useTracker(() => {
+        const noDataAvailable = { tasks: [], pendingTasksCount: 0 };
+        if (!Meteor.user()){
+            return noDataAvailable;
         }
-        return TasksCollection.find(hideCompleted ? pendingOnlyFilter : userFilter, {
-            sort: { createdAt: -1 },
-        }).fetch();
+        const handler = Meteor.subscribe('tasks');
+
+        if(!handler.ready()){
+            return { ...noDataAvailable, isLoading: true };
+        }
+
+        const tasks = TasksCollection.find(
+            hideCompleted? pendingOnlyFilter : userFilter,
+            {
+                sort: { createdAt:-1 }
+            }
+        ).fetch();
+        const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
+
+        return { tasks , pendingTasksCount };
     });
+
+    //최신순으로 정렬 sort 1: ASC, -1: DESC
+    // const conllections = useTracker(() =>{
+    //     if(!user){
+    //         return [];
+    //     }
+    //     return TasksCollection.find(hideCompleted ? pendingOnlyFilter : userFilter, {
+    //         sort: { createdAt: -1 },
+    //     }).fetch();
+    // });
 
     //테스크 삭제
-    const deleteTask = ({ _id}) => TasksCollection.remove(_id);
+    // const deleteTask = ({ _id}) => TasksCollection.remove(_id);
+    const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id);
 
-    const pendingTasksCount = useTracker(() => {
-        if (!user) {
-            return 0;
-        }
-        return TasksCollection.find(pendingOnlyFilter).count();
-    });
+    // const pendingTasksCount = useTracker(() => {
+    //     if (!user) {
+    //         return 0;
+    //     }
+    //     return TasksCollection.find(pendingOnlyFilter).count();
+    // });
 
     const pendingTasksTitle = `${
        pendingTasksCount ? `(${pendingTasksCount})` : '' 
@@ -73,13 +98,15 @@ export const App = () => {
                             {user.username || user.profile.name}
                         </div>
 
-                        <TaskForm user={user} />
+                        <TaskForm />
 
                         <div className="filter">
                             <button onClick={() => setHideCompleted(!hideCompleted)}>
                                 {hideCompleted? 'Show All' : 'Hide Completed'}
                             </button>
                         </div>
+
+                        {isLoading && <div className="loading">loading...</div> }
 
                         <ul className="tasks">
                             {tasks.map(task => (
