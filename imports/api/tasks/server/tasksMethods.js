@@ -53,5 +53,29 @@ Meteor.methods({
                 isChecked
             }
         });
+    },
+
+    'task.findAll'(hideCompleted, pendingOnlyFilter, userFilter){
+
+        if (!this.userId){
+            throw new Meteor.Error('Not authorized.');
+        }
+
+        return TasksCollection.find(
+            hideCompleted? pendingOnlyFilter : userFilter,
+            {
+                sort: { createdAt:-1 }
+            }
+        ).fetch();
+    },
+
+    'task.pendingTasksCount'(pendingOnlyFilter){
+
+        if (!this.userId){
+            throw new Meteor.Error('Not authorized.');
+        }
+
+        return TasksCollection.find(pendingOnlyFilter).count();
+
     }
 });
