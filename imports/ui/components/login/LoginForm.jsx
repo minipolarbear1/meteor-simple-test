@@ -1,10 +1,15 @@
 import {Meteor} from 'meteor/meteor';
 import React, {useState} from "react";
 import {LoginWithGithub} from "./LoginWithGithub";
+import * as queryString from "query-string/base";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const LoginForm = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const submit = e =>{
         e.preventDefault();
@@ -13,14 +18,21 @@ export const LoginForm = () => {
             if(err){
                 alert("아이디 또는 비밀번호가 일치하지 않습니다.");
             }else{
-                console.log("로그인성공");
+                const currentUserId = Meteor.userId();
+                if(currentUserId){
+                    const query = queryString.parse(location.search);
+                    if(query && query.url){
+                        return query.url;
+                    }
+                    return navigate("/task");
+                }
             }
         });
     };
 
     return(
         <form onSubmit={submit} className="login-form">
-            <LoginWithGithub/>
+            {/*<LoginWithGithub/>*/}
             <div>
                 <label htmlFor="username">UserName</label>
 

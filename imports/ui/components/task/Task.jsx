@@ -3,11 +3,12 @@ import { TasksCollection } from '../../../api/tasks/conllections/TasksCollection
 
 const updateTask = ({_id}) => {
     let updateTask = document.getElementById("updateTask");
-    TasksCollection.update(_id, {
-        $set: {
-            text:updateTask.value
-        }
-    });
+    // TasksCollection.update(_id, {
+    //     $set: {
+    //         text:updateTask.value
+    //     }
+    // });
+    Meteor.call('tasks.update', _id, updateTask.value);
 
 }
 export const Task = ({task, onCheckboxClick, onDeleteClick}) => {

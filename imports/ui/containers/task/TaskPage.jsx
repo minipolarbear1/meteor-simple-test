@@ -3,18 +3,21 @@ import {TaskForm} from "../../components/task/TaskForm";
 import {Task} from "../../components/task/Task";
 import {TasksCollection} from "../../../api/tasks/conllections/TasksCollection";
 import { useTracker } from 'meteor/react-meteor-data';
+import {useNavigate} from "react-router-dom";
 
 // CheckBox 선택 여부 체크
 const toggleChecked = ({ _id, isChecked}) => {
-    // TasksCollection.update(_id, {
-    //     $set: {
-    //         isChecked: !isChecked
-    //     }
-    // })
-    Meteor.call('tasks.setIsChecked', _id, !isChecked);
+    /* 기존 업데이트
+    TasksCollection.update(_id, {
+        $set: {
+            isChecked: !isChecked
+        }
+    })*/
+    Meteor.call('tasks.setIsChecked', _id, !isChecked); //변경 업데이트
 };
 export const TaskPage = () =>{
     const user = useTracker(() => Meteor.user());
+    const navigate = useNavigate();
 
     const [hideCompleted, setHideCompleted] = useState(false);
 
@@ -30,8 +33,8 @@ export const TaskPage = () =>{
     */
     const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
 
-    const { tasks, pendingTasksCount, isLoading } = useTracker(() => {
-        const noDataAvailable = { tasks: [], pendingTasksCount: 0 };
+    const { tasks, isLoading } = useTracker(() => {
+        const noDataAvailable = { tasks: [] };
         if (!Meteor.user()){
             return noDataAvailable;
         }
@@ -48,9 +51,7 @@ export const TaskPage = () =>{
             }
         ).fetch();
 
-        const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
-
-        return { tasks , pendingTasksCount };
+        return { tasks  };
     });
 
     //최신순으로 정렬 sort 1: ASC, -1: DESC
@@ -67,14 +68,16 @@ export const TaskPage = () =>{
     // const deleteTask = ({ _id}) => TasksCollection.remove(_id); //기존(테스크(필드) 삭제)
     const deleteTask = ({ _id }) => Meteor.call('tasks.remove', _id); //변경(테스크(필드) 삭제)
 
-    const pendingTasksTitle = `${
-        pendingTasksCount ? `(${pendingTasksCount})` : ''
-    }`;
-    const logout = () => Meteor.logout();
-
+    const logout = () => Meteor.logout(function (err){
+        if(err){
+            alert(err);
+        }else{
+            return navigate("/");
+        }
+    });
 
     return(
-        <Fragment>
+        <>
             <div className="user" onClick={logout}>
                 {user.username || user.profile.name}
             </div>
@@ -99,6 +102,6 @@ export const TaskPage = () =>{
                     />
                 ))}
             </ul>
-        </Fragment>
+        </>
     )
 }

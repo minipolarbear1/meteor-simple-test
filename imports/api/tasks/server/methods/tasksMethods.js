@@ -1,6 +1,6 @@
 import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
-import {TasksCollection} from "../conllections/TasksCollection";
+import {TasksCollection} from "../../conllections/TasksCollection";
 
 Meteor.methods({
     'tasks.insert'(text){
@@ -18,7 +18,6 @@ Meteor.methods({
     },
 
     'tasks.remove'(taskId) {
-        check(taskId, String);
 
         if (!this.userId) {
             throw new Meteor.Error('Not authorized.');
@@ -31,6 +30,27 @@ Meteor.methods({
         }
 
         TasksCollection.remove(taskId);
+    },
+
+    'tasks.update'(taskId, text){
+        check(text, String);
+
+        if (!this.userId){
+            throw new Meteor.Error('Not authorized.');
+        }
+
+        const task = TasksCollection.findOne({ _id: taskId, userId: this.userId });
+
+        if (!task) {
+            throw new Meteor.Error('Access denied.');
+        }
+
+        TasksCollection.update(taskId, {
+            $set: {
+                text:text
+            }
+        });
+
     },
 
     'tasks.setIsChecked'(taskId, isChecked) {
@@ -69,9 +89,9 @@ Meteor.methods({
         ).fetch();
     },
 
-    'task.pendingTasksCount'(pendingOnlyFilter){
+    'task.pendingTasksCount'(pendingOnlyFilter, userId){
 
-        if (!this.userId){
+        if (!userId){
             throw new Meteor.Error('Not authorized.');
         }
 
